@@ -31,7 +31,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.range.RangeBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.sonar.api.measures.Metric;
 import org.sonar.server.es.BaseIndex;
@@ -150,7 +150,7 @@ public class ProjectMeasuresIndex extends BaseIndex {
   }
 
   private static AbstractAggregationBuilder createRangeFacet(String metricKey, List<Double> thresholds) {
-    RangeBuilder rangeAgg = AggregationBuilders.range(metricKey)
+    RangeAggregationBuilder rangeAgg = AggregationBuilders.range(metricKey)
       .field(FIELD_VALUE);
     final int lastIndex = thresholds.size() - 1;
     IntStream.range(0, thresholds.size())

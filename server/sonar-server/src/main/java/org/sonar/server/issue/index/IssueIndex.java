@@ -57,7 +57,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
-import org.elasticsearch.search.aggregations.metrics.sum.SumBuilder;
+import org.elasticsearch.search.aggregations.metrics.sum.SumAggregationBuilder;
 import org.joda.time.Duration;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.resources.Scopes;
@@ -136,7 +136,7 @@ public class IssueIndex extends BaseIndex {
 
   private static final String IS_ASSIGNED_FILTER = "__isAssigned";
 
-  private static final SumBuilder EFFORT_AGGREGATION = AggregationBuilders.sum(FACET_MODE_EFFORT).field(IssueIndexDefinition.FIELD_ISSUE_EFFORT);
+  private static final SumAggregationBuilder EFFORT_AGGREGATION = AggregationBuilders.sum(FACET_MODE_EFFORT).field(IssueIndexDefinition.FIELD_ISSUE_EFFORT);
   private static final Order EFFORT_AGGREGATION_ORDER = Order.aggregation(FACET_MODE_EFFORT, false);
 
   private static final int DEFAULT_FACET_SIZE = 15;
