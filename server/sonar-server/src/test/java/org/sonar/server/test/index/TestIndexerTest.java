@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.junit.Rule;
@@ -174,7 +175,7 @@ public class TestIndexerTest {
       .setId(uuid)
       .setRouting(projectUuid)
       .setSource(FileUtils.readFileToString(TestUtils.getResource(this.getClass(), projectUuid + "_" + fileUuid + "_" + testName + ".json")))
-      .setRefresh(true)
+      .setRefreshPolicy(RefreshPolicy.IMMEDIATE)
       .get();
   }
 

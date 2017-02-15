@@ -35,6 +35,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
@@ -123,7 +124,7 @@ public class BulkIndexer implements Startable {
 
       updateSettings(bulkSettings);
     }
-    bulkRequest = client.prepareBulk().setRefresh(false);
+    bulkRequest = client.prepareBulk().setRefreshPolicy(RefreshPolicy.NONE);
     counter.set(0L);
     progress.start();
   }
@@ -215,7 +216,7 @@ public class BulkIndexer implements Startable {
 
   private void executeBulk() {
     final BulkRequestBuilder req = this.bulkRequest;
-    this.bulkRequest = client.prepareBulk().setRefresh(false);
+    this.bulkRequest = client.prepareBulk().setRefreshPolicy(RefreshPolicy.NONE);
     semaphore.acquireUninterruptibly();
     req.execute(new BulkResponseActionListener(req));
   }

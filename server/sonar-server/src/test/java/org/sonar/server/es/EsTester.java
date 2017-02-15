@@ -37,6 +37,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.common.unit.TimeValue;
@@ -93,7 +94,7 @@ public class EsTester extends ExternalResource {
 
   public void putDocuments(String index, String type, BaseDoc... docs) {
     try {
-      BulkRequestBuilder bulk = client.prepareBulk().setRefresh(true);
+      BulkRequestBuilder bulk = client.prepareBulk().setRefreshPolicy(RefreshPolicy.IMMEDIATE);
       for (BaseDoc doc : docs) {
         bulk.add(new IndexRequest(index, type, doc.getId())
           .parent(doc.getParent())

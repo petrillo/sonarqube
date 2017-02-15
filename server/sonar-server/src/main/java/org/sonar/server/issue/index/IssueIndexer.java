@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.sonar.api.resources.Qualifiers;
 import org.sonar.api.utils.System2;
 import org.sonar.db.DbClient;
@@ -139,7 +140,7 @@ public class IssueIndexer extends BaseIndexer implements ProjectIndexer, NeedAut
     BulkRequestBuilder builder = esClient.prepareBulk();
     for (String issueKey : issueKeys) {
       builder.add(esClient.prepareDelete(INDEX, TYPE_ISSUE, issueKey)
-        .setRefresh(false)
+        .setRefreshPolicy(RefreshPolicy.NONE)
         .setRouting(projectUuid));
       count++;
       if (count >= MAX_BATCH_SIZE) {

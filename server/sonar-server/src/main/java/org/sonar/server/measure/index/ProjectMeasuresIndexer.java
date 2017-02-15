@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Iterator;
 import javax.annotation.Nullable;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.sonar.api.resources.Qualifiers;
 import org.sonar.api.utils.System2;
 import org.sonar.db.DbClient;
@@ -82,7 +83,7 @@ public class ProjectMeasuresIndexer extends BaseIndexer implements ProjectIndexe
     esClient
       .prepareDelete(INDEX_PROJECT_MEASURES, TYPE_PROJECT_MEASURE, uuid)
       .setRouting(uuid)
-      .setRefresh(true)
+      .setRefreshPolicy(RefreshPolicy.IMMEDIATE)
       .get();
   }
 

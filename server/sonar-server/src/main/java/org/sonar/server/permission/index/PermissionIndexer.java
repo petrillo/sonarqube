@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.picocontainer.Startable;
 import org.sonar.api.utils.DateUtils;
 import org.sonar.core.util.stream.Collectors;
@@ -134,7 +135,7 @@ public class PermissionIndexer implements ProjectIndexer, Startable {
     authorizationScopes.forEach(scope -> esClient
       .prepareDelete(scope.getIndexName(), TYPE_AUTHORIZATION, projectUuid)
       .setRouting(projectUuid)
-      .setRefresh(true)
+      .setRefreshPolicy(RefreshPolicy.IMMEDIATE)
       .get());
   }
 
@@ -153,7 +154,7 @@ public class PermissionIndexer implements ProjectIndexer, Startable {
       return;
     }
     int count = 0;
-    BulkRequestBuilder bulkRequest = esClient.prepareBulk().setRefresh(false);
+    BulkRequestBuilder bulkRequest = esClient.prepareBulk().setRefreshPolicy(RefreshPolicy.NONE);
     for (PermissionIndexerDao.Dto dto : authorizations) {
       for (AuthorizationScope scope : authorizationScopes) {
         if (scope.getProjectPredicate().test(dto)) {
@@ -163,7 +164,7 @@ public class PermissionIndexer implements ProjectIndexer, Startable {
       }
       if (count >= MAX_BATCH_SIZE) {
         EsUtils.executeBulkRequest(bulkRequest, BULK_ERROR_MESSAGE);
-        bulkRequest = esClient.prepareBulk().setRefresh(false);
+        bulkRequest = esClient.prepareBulk().setRefreshPolicy(RefreshPolicy.NONE);
         count = 0;
       }
     }
