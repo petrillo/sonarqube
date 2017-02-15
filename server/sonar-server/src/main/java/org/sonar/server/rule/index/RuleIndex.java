@@ -42,10 +42,9 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.HasParentQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder.Operator;
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -183,7 +182,7 @@ public class RuleIndex extends BaseIndex {
     qb.should(simpleQueryStringQuery(query.getQueryText())
       .field(SEARCH_WORDS_ANALYZER.subField(FIELD_RULE_NAME), 20f)
       .field(FIELD_RULE_HTML_DESCRIPTION, 3f)
-      .defaultOperator(SimpleQueryStringBuilder.Operator.AND)).boost(20f);
+      .defaultOperator(Operator.AND)).boost(20f);
 
     // Match and partial Match queries
     // Search by key uses the "sortable" sub-field as it requires to be case-insensitive (lower-case filtering)
