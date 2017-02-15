@@ -60,7 +60,7 @@ import static java.lang.String.format;
 public class BulkIndexer implements Startable {
 
   private static final Logger LOGGER = Loggers.get(BulkIndexer.class);
-  private static final long FLUSH_BYTE_SIZE = new ByteSizeValue(1, ByteSizeUnit.MB).bytes();
+  private static final long FLUSH_BYTE_SIZE = new ByteSizeValue(1, ByteSizeUnit.MB).bytesAsInt();
   private static final String REFRESH_INTERVAL_SETTING = "index.refresh_interval";
   private static final String ALREADY_STARTED_MESSAGE = "Bulk indexing is already started";
 
