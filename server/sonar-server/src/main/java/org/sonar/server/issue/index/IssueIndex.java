@@ -470,7 +470,7 @@ public class IssueIndex extends BaseIndex {
     BoolQueryBuilder esFilter = boolQuery();
     filters.values().stream().filter(Objects::nonNull).forEach(esFilter::must);
     if (esFilter.hasClauses()) {
-      esRequest.setQuery(QueryBuilders.filteredQuery(esQuery, esFilter));
+      esRequest.setQuery(boolQuery().must(esQuery).filter(esFilter));
     } else {
       esRequest.setQuery(esQuery);
     }

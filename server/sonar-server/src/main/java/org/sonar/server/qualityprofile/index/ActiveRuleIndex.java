@@ -80,9 +80,7 @@ public class ActiveRuleIndex extends BaseIndex {
 
     SearchRequestBuilder request = getClient().prepareSearch(INDEX)
       .setTypes(TYPE_ACTIVE_RULE)
-      .setQuery(QueryBuilders.filteredQuery(
-        QueryBuilders.matchAllQuery(),
-        filter))
+      .setQuery(QueryBuilders.boolQuery().filter(filter))
       .setSize(0)
       .addAggregation(AggregationBuilders
         .terms(indexField)

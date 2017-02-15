@@ -123,7 +123,7 @@ public class UserIndex {
       .setFetchSource(
         new String[] {UserIndexDefinition.FIELD_LOGIN, UserIndexDefinition.FIELD_NAME},
         null)
-      .setQuery(QueryBuilders.filteredQuery(matchAllQuery(), filter));
+      .setQuery(QueryBuilders.boolQuery().filter(filter));
     SearchResponse response = requestBuilder.get();
 
     return EsUtils.scroll(esClient, response.getScrollId(), DOC_CONVERTER);
@@ -136,8 +136,7 @@ public class UserIndex {
       .setFrom(options.getOffset())
       .addSort(UserIndexDefinition.FIELD_NAME, SortOrder.ASC);
 
-    BoolQueryBuilder userQuery = boolQuery()
-      .must(termQuery(UserIndexDefinition.FIELD_ACTIVE, true));
+    QueryBuilder userQuery = termQuery(UserIndexDefinition.FIELD_ACTIVE, true);
 
     QueryBuilder query;
     if (StringUtils.isEmpty(searchText)) {
@@ -153,8 +152,7 @@ public class UserIndex {
         .operator(MatchQueryBuilder.Operator.AND);
     }
 
-    request.setQuery(QueryBuilders.filteredQuery(query,
-      userQuery));
+    request.setQuery(QueryBuilders.boolQuery().must(query).filter(userQuery));
 
     return new SearchResult<>(request.get(), DOC_CONVERTER);
   }
