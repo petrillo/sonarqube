@@ -27,6 +27,7 @@ import javax.annotation.concurrent.Immutable;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.picocontainer.injectors.ProviderAdapter;
 import org.sonar.api.ce.ComputeEngineSide;
 import org.sonar.api.config.Settings;
@@ -54,13 +55,13 @@ public class EsClientProvider extends ProviderAdapter {
       boolean clusterEnabled = settings.getBoolean(ProcessProperties.CLUSTER_ENABLED);
       if (clusterEnabled && settings.getBoolean(ProcessProperties.CLUSTER_SEARCH_DISABLED)) {
         esSettings.put("client.transport.sniff", true);
-        nativeClient = TransportClient.builder().settings(esSettings).build();
+        nativeClient = new PreBuiltTransportClient(esSettings.build());
         Arrays.stream(settings.getStringArray(ProcessProperties.CLUSTER_SEARCH_HOSTS))
           .map(Host::parse)
           .forEach(h -> h.addTo(nativeClient));
         LOGGER.info("Connected to remote Elasticsearch: [{}]", displayedAddresses(nativeClient));
       } else {
-        nativeClient = TransportClient.builder().settings(esSettings).build();
+        nativeClient = new PreBuiltTransportClient(esSettings.build());
         Host host = new Host(settings.getString(ProcessProperties.SEARCH_HOST), settings.getInt(ProcessProperties.SEARCH_PORT));
         host.addTo(nativeClient);
         LOGGER.info("Connected to local Elasticsearch: [{}]", displayedAddresses(nativeClient));
