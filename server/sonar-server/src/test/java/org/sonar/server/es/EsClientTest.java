@@ -37,6 +37,7 @@ import org.sonar.server.es.request.ProxyPutMappingRequestBuilder;
 import org.sonar.server.es.request.ProxyRefreshRequestBuilder;
 import org.sonar.server.es.request.ProxySearchRequestBuilder;
 import org.sonar.server.es.request.ProxySearchScrollRequestBuilder;
+import org.sonar.server.view.index.ViewIndexDefinition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

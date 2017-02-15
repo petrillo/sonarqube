@@ -49,7 +49,7 @@ import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -475,7 +475,7 @@ public class RuleIndex extends BaseIndex {
   public Set<String> terms(String fields, @Nullable String query, int size) {
     String aggregationKey = "_ref";
 
-    TermsBuilder termsAggregation = AggregationBuilders.terms(aggregationKey)
+    TermsAggregationBuilder termsAggregation = AggregationBuilders.terms(aggregationKey)
       .field(fields)
       .size(size)
       .minDocCount(1);

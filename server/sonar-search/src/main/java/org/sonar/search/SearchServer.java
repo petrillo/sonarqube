@@ -19,11 +19,13 @@
  */
 package org.sonar.search;
 
+import com.google.common.base.Throwables;
+import java.io.IOException;
 import org.apache.lucene.util.StringHelper;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.node.NodeValidationException;
 import org.sonar.process.Jmx;
 import org.sonar.process.MinimumViableSystem;
 import org.sonar.process.Monitored;
@@ -45,8 +47,12 @@ public class SearchServer implements Monitored {
   public void start() {
     Jmx.register(EsSettingsMBean.OBJECT_NAME, settings);
     initBootstrap();
-    node = NodeBuilder.nodeBuilder().settings(settings.build()).build();
-    node.start();
+    node = new Node(settings.build());
+    try {
+      node.start();
+    } catch (NodeValidationException e) {
+      Throwables.propagate(e);
+    }
   }
 
   // copied from https://github.com/elastic/elasticsearch/blob/v2.3.3/core/src/main/java/org/elasticsearch/bootstrap/Bootstrap.java
@@ -79,7 +85,11 @@ public class SearchServer implements Monitored {
   @Override
   public void stop() {
     if (node != null && !node.isClosed()) {
-      node.close();
+      try {
+        node.close();
+      } catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
     Jmx.unregister(EsSettingsMBean.OBJECT_NAME);
   }

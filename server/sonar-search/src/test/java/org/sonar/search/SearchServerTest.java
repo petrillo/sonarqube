@@ -20,6 +20,8 @@
 package org.sonar.search;
 
 import java.net.InetAddress;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
@@ -27,6 +29,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.plugins.Plugin;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -85,7 +88,9 @@ public class SearchServerTest {
     assertThat(underTest.isUp()).isTrue();
 
     Settings settings = Settings.builder().put("cluster.name", A_CLUSTER_NAME).build();
-    client = TransportClient.builder().settings(settings).build()
+    Collection<Class<? extends Plugin>> plugins = Collections.emptyList();
+    client = new TransportClient(settings, plugins) {
+    }
       .addTransportAddress(new InetSocketTransportAddress(host, port));
     assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isEqualTo(ClusterHealthStatus.GREEN);
 

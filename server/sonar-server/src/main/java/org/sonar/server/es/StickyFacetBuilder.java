@@ -34,7 +34,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 
@@ -94,7 +94,7 @@ public class StickyFacetBuilder {
   }
 
   public FilterAggregationBuilder buildTopFacetAggregation(String fieldName, String facetName, BoolQueryBuilder facetFilter, int size) {
-    TermsBuilder termsAggregation = AggregationBuilders.terms(facetName)
+    TermsAggregationBuilder termsAggregation = AggregationBuilders.terms(facetName)
       .field(fieldName)
       .order(order)
       .size(size)
@@ -115,7 +115,7 @@ public class StickyFacetBuilder {
         .map(s -> EsUtils.escapeSpecialRegexChars(s.toString()))
         .collect(PIPE_JOINER);
 
-      TermsBuilder selectedTerms = AggregationBuilders.terms(facetName + "_selected")
+      TermsAggregationBuilder selectedTerms = AggregationBuilders.terms(facetName + "_selected")
         .field(fieldName)
         .include(includes);
       if (subAggregation != null) {

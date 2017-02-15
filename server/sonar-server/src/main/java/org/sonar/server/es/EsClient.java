@@ -147,14 +147,6 @@ public class EsClient implements Closeable {
     return new ProxyMultiGetRequestBuilder(nativeClient());
   }
 
-  /**
-   * @deprecated use {@link #prepareSearch(String...)} with size 0
-   */
-  @Deprecated
-  public SearchRequestBuilder prepareCount(String... indices) {
-    return prepareSearch(indices).addSort(new FieldSortBuilder("_doc")).setSize(0);
-  }
-
   public BulkRequestBuilder prepareBulk() {
     return new ProxyBulkRequestBuilder(nativeClient());
   }

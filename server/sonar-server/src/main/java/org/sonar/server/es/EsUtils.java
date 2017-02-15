@@ -40,6 +40,9 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.joda.time.format.ISODateTimeFormat;
 import org.sonar.core.util.stream.Collectors;
 
@@ -53,6 +56,8 @@ public class EsUtils {
    * See https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html
    */
   private static final Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[#@&~<>\"{}()\\[\\].+*?^$\\\\|]");
+
+  private static final String SUBSTRING_MATCH_REGEXP = ".*%s.*";
 
   private EsUtils() {
     // only static methods
@@ -119,6 +124,17 @@ public class EsUtils {
    */
   public static String escapeSpecialRegexChars(String str) {
     return SPECIAL_REGEX_CHARS.matcher(str).replaceAll("\\\\$0");
+  }
+
+  public static IncludeExclude includeAccordingToUserInput(String userInput) {
+    String escaped = escapeSpecialRegexChars(userInput);
+    return new IncludeExclude(escaped, null);
+  }
+
+  public static IncludeExclude includeAccordingToPartialUserInput(String partialUserInput) {
+    String escaped = escapeSpecialRegexChars(partialUserInput);
+    String anywhere = String.format(SUBSTRING_MATCH_REGEXP, escaped);
+    return new IncludeExclude(anywhere, null);
   }
 
   private static class DocScrollIterator<D extends BaseDoc> implements Iterator<D> {
@@ -210,5 +226,9 @@ public class EsUtils {
 
   public static boolean isEmpty(EsClient esClient, String index, String... types) {
     return count(esClient, index, types) <= 0;
+  }
+
+  public static SortBuilder<?> indexOrder() {
+    return new FieldSortBuilder(DefaultIndexSettings.DOC_FIELD);
   }
 }

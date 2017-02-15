@@ -43,7 +43,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -52,11 +51,11 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.global.Global;
-import org.elasticsearch.search.aggregations.bucket.global.GlobalBuilder;
+import org.elasticsearch.search.aggregations.bucket.global.GlobalAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.aggregations.metrics.sum.SumBuilder;
 import org.joda.time.Duration;
@@ -86,7 +85,6 @@ import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
-import static org.sonar.server.es.EsUtils.escapeSpecialRegexChars;
 import static org.sonarqube.ws.client.issue.IssuesWsParameters.DEPRECATED_FACET_MODE_DEBT;
 import static org.sonarqube.ws.client.issue.IssuesWsParameters.DEPRECATED_PARAM_ACTION_PLANS;
 import static org.sonarqube.ws.client.issue.IssuesWsParameters.FACET_ASSIGNED_TO_ME;
@@ -112,8 +110,6 @@ import static org.sonarqube.ws.client.issue.IssuesWsParameters.PARAM_TYPES;
  * All the requests are listed here.
  */
 public class IssueIndex extends BaseIndex {
-
-  private static final String SUBSTRING_MATCH_REGEXP = ".*%s.*";
 
   public static final List<String> SUPPORTED_FACETS = ImmutableList.of(
     PARAM_SEVERITIES,
@@ -534,11 +530,10 @@ public class IssueIndex extends BaseIndex {
     BoolQueryBuilder facetFilter = assignedToMeFacetBuilder.getStickyFacetFilter(IS_ASSIGNED_FILTER, fieldName);
 
     FilterAggregationBuilder facetTopAggregation = AggregationBuilders
-      .filter(facetName + "__filter")
-      .filter(facetFilter)
+      .filter(facetName + "__filter", facetFilter)
       .subAggregation(addEffortAggregationIfNeeded(query, AggregationBuilders.terms(facetName + "__terms")
         .field(fieldName)
-        .include(escapeSpecialRegexChars(login))));
+        .includeExclude(EsUtils.includeAccordingToUserInput(login))));
 
     builder.addAggregation(
       AggregationBuilders.global(facetName)
@@ -581,24 +576,23 @@ public class IssueIndex extends BaseIndex {
 
     requestBuilder.setQuery(boolQuery().must(matchAllQuery()).filter(createBoolFilter(query)));
 
-    GlobalBuilder topAggreg = AggregationBuilders.global("tags");
+    GlobalAggregationBuilder topAggreg = AggregationBuilders.global("tags");
     String tagsOnIssuesSubAggregation = "tags__issues";
     String tagsOnRulesSubAggregation = "tags__rules";
 
-    TermsBuilder issueTags = AggregationBuilders.terms(tagsOnIssuesSubAggregation)
+    TermsAggregationBuilder issueTags = AggregationBuilders.terms(tagsOnIssuesSubAggregation)
       .field(IssueIndexDefinition.FIELD_ISSUE_TAGS)
       .size(maxNumberOfTags)
       .order(Terms.Order.term(true))
       .minDocCount(1L);
-    TermsBuilder ruleTags = AggregationBuilders.terms(tagsOnRulesSubAggregation)
+    TermsAggregationBuilder ruleTags = AggregationBuilders.terms(tagsOnRulesSubAggregation)
       .field(RuleIndexDefinition.FIELD_RULE_ALL_TAGS)
       .size(maxNumberOfTags)
       .order(Terms.Order.term(true))
       .minDocCount(1L);
     if (textQuery != null) {
-      String escapedTextQuery = escapeSpecialRegexChars(textQuery);
-      issueTags.include(format(SUBSTRING_MATCH_REGEXP, escapedTextQuery));
-      ruleTags.include(format(SUBSTRING_MATCH_REGEXP, escapedTextQuery));
+      issueTags.includeExclude(EsUtils.includeAccordingToPartialUserInput(textQuery));
+      ruleTags.includeExclude(EsUtils.includeAccordingToPartialUserInput(textQuery));
     }
 
     SearchResponse searchResponse = requestBuilder.addAggregation(topAggreg.subAggregation(issueTags).subAggregation(ruleTags)).get();
@@ -631,13 +625,13 @@ public class IssueIndex extends BaseIndex {
 
     requestBuilder.setQuery(boolQuery().must(QueryBuilders.matchAllQuery()).filter(createBoolFilter(query)));
 
-    TermsBuilder aggreg = AggregationBuilders.terms("_ref")
+    TermsAggregationBuilder aggreg = AggregationBuilders.terms("_ref")
       .field(fieldName)
       .size(maxNumberOfTags)
       .order(termsOrder)
       .minDocCount(1L);
     if (textQuery != null) {
-      aggreg.include(format(SUBSTRING_MATCH_REGEXP, escapeSpecialRegexChars(textQuery)));
+      aggreg.includeExclude(EsUtils.includeAccordingToPartialUserInput(textQuery));
     }
 
     SearchResponse searchResponse = requestBuilder.addAggregation(aggreg).get();
@@ -677,7 +671,7 @@ public class IssueIndex extends BaseIndex {
     SearchRequestBuilder requestBuilder = getClient()
       .prepareSearch(IssueIndexDefinition.INDEX)
       .setTypes(IssueIndexDefinition.TYPE_ISSUE)
-      .setSearchType(SearchType.SCAN)
+      .addSort(EsUtils.indexOrder())
       .setScroll(TimeValue.timeValueMinutes(EsUtils.SCROLL_TIME_IN_MINUTES))
       .setSize(10_000)
       .setFetchSource(

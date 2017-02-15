@@ -62,6 +62,8 @@ public class DefaultIndexSettings {
   public static final String MAX_GRAM = "max_gram";
   public static final String LENGTH = "length";
 
+  public static final String DOC_FIELD = "_doc";
+
   private DefaultIndexSettings() {
     // only static stuff
   }
