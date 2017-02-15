@@ -34,7 +34,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -149,7 +149,7 @@ public class UserIndex {
         UserIndexDefinition.FIELD_NAME + "." + UserIndexDefinition.SEARCH_SUB_SUFFIX,
         UserIndexDefinition.FIELD_EMAIL,
         UserIndexDefinition.FIELD_EMAIL + "." + UserIndexDefinition.SEARCH_SUB_SUFFIX)
-        .operator(MatchQueryBuilder.Operator.AND);
+        .operator(Operator.AND);
     }
 
     request.setQuery(QueryBuilders.boolQuery().must(query).filter(userQuery));

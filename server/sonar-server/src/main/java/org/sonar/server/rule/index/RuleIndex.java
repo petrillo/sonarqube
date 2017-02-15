@@ -42,7 +42,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.HasParentQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
@@ -187,8 +187,8 @@ public class RuleIndex extends BaseIndex {
 
     // Match and partial Match queries
     // Search by key uses the "sortable" sub-field as it requires to be case-insensitive (lower-case filtering)
-    qb.should(matchQuery(SORTABLE_ANALYZER.subField(FIELD_RULE_KEY), queryString).operator(MatchQueryBuilder.Operator.AND).boost(30f));
-    qb.should(matchQuery(SORTABLE_ANALYZER.subField(FIELD_RULE_RULE_KEY), queryString).operator(MatchQueryBuilder.Operator.AND).boost(15f));
+    qb.should(matchQuery(SORTABLE_ANALYZER.subField(FIELD_RULE_KEY), queryString).operator(Operator.AND).boost(30f));
+    qb.should(matchQuery(SORTABLE_ANALYZER.subField(FIELD_RULE_RULE_KEY), queryString).operator(Operator.AND).boost(15f));
     qb.should(termQuery(FIELD_RULE_LANGUAGE, queryString, 3f));
     qb.should(termQuery(FIELD_RULE_ALL_TAGS, queryString, 10f));
     qb.should(termAnyQuery(FIELD_RULE_ALL_TAGS, queryString, 1f));
@@ -199,14 +199,14 @@ public class RuleIndex extends BaseIndex {
   private static QueryBuilder termQuery(String field, String query, float boost) {
     return QueryBuilders.multiMatchQuery(query,
       field, SEARCH_WORDS_ANALYZER.subField(field))
-      .operator(MatchQueryBuilder.Operator.AND)
+      .operator(Operator.AND)
       .boost(boost);
   }
 
   private static QueryBuilder termAnyQuery(String field, String query, float boost) {
     return QueryBuilders.multiMatchQuery(query,
       field, SEARCH_WORDS_ANALYZER.subField(field))
-      .operator(MatchQueryBuilder.Operator.OR)
+      .operator(Operator.OR)
       .boost(boost);
   }
 
