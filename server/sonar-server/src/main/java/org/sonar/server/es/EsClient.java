@@ -33,7 +33,6 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuild
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequestBuilder;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequestBuilder;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.MultiGetRequestBuilder;
@@ -46,6 +45,7 @@ import org.elasticsearch.common.Priority;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.max.Max;
+import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 import org.sonar.server.es.request.ProxyBulkRequestBuilder;
@@ -53,7 +53,6 @@ import org.sonar.server.es.request.ProxyClearCacheRequestBuilder;
 import org.sonar.server.es.request.ProxyClusterHealthRequestBuilder;
 import org.sonar.server.es.request.ProxyClusterStateRequestBuilder;
 import org.sonar.server.es.request.ProxyClusterStatsRequestBuilder;
-import org.sonar.server.es.request.ProxyCountRequestBuilder;
 import org.sonar.server.es.request.ProxyCreateIndexRequestBuilder;
 import org.sonar.server.es.request.ProxyDeleteRequestBuilder;
 import org.sonar.server.es.request.ProxyFlushRequestBuilder;
@@ -152,8 +151,8 @@ public class EsClient implements Closeable {
    * @deprecated use {@link #prepareSearch(String...)} with size 0
    */
   @Deprecated
-  public CountRequestBuilder prepareCount(String... indices) {
-    return new ProxyCountRequestBuilder(nativeClient()).setIndices(indices);
+  public SearchRequestBuilder prepareCount(String... indices) {
+    return prepareSearch(indices).addSort(new FieldSortBuilder("_doc")).setSize(0);
   }
 
   public BulkRequestBuilder prepareBulk() {

@@ -30,6 +30,7 @@ import org.sonar.db.component.UuidWithProjectUuidDto;
 import org.sonar.server.es.BaseIndexer;
 import org.sonar.server.es.BulkIndexer;
 import org.sonar.server.es.EsClient;
+import org.sonar.server.es.EsUtils;
 
 import static com.google.common.collect.Maps.newHashMap;
 
@@ -52,8 +53,7 @@ public class ViewIndexer extends BaseIndexer {
    */
   @Override
   protected long doIndex(long lastUpdatedAt) {
-    long count = esClient.prepareCount(ViewIndexDefinition.INDEX).setTypes(ViewIndexDefinition.TYPE_VIEW).get().getCount();
-    if (count == 0) {
+    if (EsUtils.isEmpty(esClient, ViewIndexDefinition.INDEX, ViewIndexDefinition.TYPE_VIEW)) {
       DbSession dbSession = dbClient.openSession(false);
       try {
         Map<String, String> viewAndProjectViewUuidMap = newHashMap();

@@ -200,4 +200,15 @@ public class EsUtils {
       throw new UnsupportedOperationException("Cannot remove item when scrolling");
     }
   }
+
+  public static long count(EsClient esClient, String index, String... types) {
+    return esClient
+      .prepareSearch(index).setTypes(types)
+      .setSize(0)
+      .get().getHits().getTotalHits();
+  }
+
+  public static boolean isEmpty(EsClient esClient, String index, String... types) {
+    return count(esClient, index, types) <= 0;
+  }
 }
