@@ -133,7 +133,7 @@ public class EsTester extends ExternalResource {
    */
   public List<SearchHit> getDocuments(String indexName, String typeName) {
     SearchRequestBuilder req = client.nativeClient().prepareSearch(indexName).setTypes(typeName).setQuery(QueryBuilders.matchAllQuery());
-    req.setSearchType(SearchType.SCAN)
+    req.addSort(EsUtils.indexOrder())
       .setScroll(new TimeValue(60000))
       .setSize(100);
 

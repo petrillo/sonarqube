@@ -31,7 +31,6 @@ import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
@@ -116,7 +115,6 @@ public class UserIndex {
     SearchRequestBuilder requestBuilder = esClient
       .prepareSearch(UserIndexDefinition.INDEX)
       .setTypes(UserIndexDefinition.TYPE_USER)
-      .setSearchType(SearchType.SCAN)
       .addSort(SortBuilders.fieldSort(UserIndexDefinition.FIELD_LOGIN).order(SortOrder.ASC))
       .setScroll(TimeValue.timeValueMinutes(EsUtils.SCROLL_TIME_IN_MINUTES))
       .setSize(10_000)

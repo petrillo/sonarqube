@@ -38,7 +38,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.HasParentQueryBuilder;
@@ -58,6 +57,7 @@ import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
 import org.sonar.server.es.BaseIndex;
 import org.sonar.server.es.EsClient;
+import org.sonar.server.es.EsUtils;
 import org.sonar.server.es.SearchIdResult;
 import org.sonar.server.es.SearchOptions;
 import org.sonar.server.es.StickyFacetBuilder;
@@ -148,7 +148,7 @@ public class RuleIndex extends BaseIndex {
     SearchRequestBuilder esSearch = getClient()
       .prepareSearch(INDEX)
       .setTypes(TYPE_RULE)
-      .setSearchType(SearchType.SCAN)
+      .addSort(EsUtils.indexOrder())
       .setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES));
 
     QueryBuilder qb = buildQuery(query);

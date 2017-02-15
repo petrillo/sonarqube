@@ -20,13 +20,13 @@
 package org.sonar.server.es.request;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.unit.TimeValue;
 import org.junit.Rule;
 import org.junit.Test;
 import org.sonar.api.utils.log.LogTester;
 import org.sonar.api.utils.log.LoggerLevel;
 import org.sonar.server.es.EsTester;
+import org.sonar.server.es.EsUtils;
 import org.sonar.server.es.FakeIndexDefinition;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +45,7 @@ public class ProxySearchScrollRequestBuilderTest {
     logTester.setLevel(LoggerLevel.TRACE);
 
     SearchResponse response = esTester.client().prepareSearch(FakeIndexDefinition.INDEX)
-      .setSearchType(SearchType.SCAN)
+      .addSort(EsUtils.indexOrder())
       .setScroll(TimeValue.timeValueMinutes(1))
       .get();
     logTester.clear();
@@ -58,7 +58,7 @@ public class ProxySearchScrollRequestBuilderTest {
     logTester.setLevel(LoggerLevel.DEBUG);
 
     SearchResponse response = esTester.client().prepareSearch(FakeIndexDefinition.INDEX)
-      .setSearchType(SearchType.SCAN)
+      .addSort(EsUtils.indexOrder())
       .setScroll(TimeValue.timeValueMinutes(1))
       .get();
     logTester.clear();
