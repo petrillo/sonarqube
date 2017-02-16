@@ -62,6 +62,11 @@ public class DefaultIndexSettings {
   public static final String MAX_GRAM = "max_gram";
   public static final String LENGTH = "length";
 
+  // using the advanced similarity (default in es 5.x) reduces
+  // the effects of sharding
+  public static final String SIMILARITY = "similarity";
+  public static final String BM25 = "BM25";
+
   private DefaultIndexSettings() {
     // only static stuff
   }
