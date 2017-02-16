@@ -39,7 +39,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static org.sonar.server.es.DefaultIndexSettings.ANALYZED;
 import static org.sonar.server.es.DefaultIndexSettings.ANALYZER;
+import static org.sonar.server.es.DefaultIndexSettings.BM25;
 import static org.sonar.server.es.DefaultIndexSettings.INDEX;
+import static org.sonar.server.es.DefaultIndexSettings.SIMILARITY;
 import static org.sonar.server.es.DefaultIndexSettings.STRING;
 import static org.sonar.server.es.DefaultIndexSettings.TYPE;
 import static org.sonar.server.es.DefaultIndexSettingsElement.UUID_MODULE_ANALYZER;
@@ -275,14 +277,16 @@ public class NewIndex {
         hash.putAll(ImmutableMap.of(
           "type", "string",
           "index", disableSearch ? "no" : "not_analyzed",
-          "norms", ImmutableMap.of("enabled", String.valueOf(!disableNorms))));
+          "norms", ImmutableMap.of("enabled", String.valueOf(!disableNorms)),
+          SIMILARITY, BM25));
       } else {
         hash.put("type", "multi_field");
         Map<String, Object> multiFields = new TreeMap<>(subFields);
         multiFields.put(fieldName, ImmutableMap.of(
           "type", "string",
           "index", "not_analyzed",
-          "norms", ImmutableMap.of("enabled", "false")));
+          "norms", ImmutableMap.of("enabled", "false"),
+          SIMILARITY, BM25));
         hash.put("fields", multiFields);
       }
 
