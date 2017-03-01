@@ -23,5 +23,5 @@
 package org.sonar.application;
 
 public interface Scheduler {
-  void start();
+  void startProcesses();
 }

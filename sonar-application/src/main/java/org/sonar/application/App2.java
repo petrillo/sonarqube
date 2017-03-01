@@ -34,7 +34,7 @@ public class App2 {
     CommandLineParser cli = new CommandLineParser();
     Properties commandLineArguments = cli.parseArguments(args);
 
-    Props props = new PropsBuilder(commandLineArguments, new JdbcSettings()).build() ;
+    Props props = new PropsBuilder(commandLineArguments, new JdbcSettings()).build();
 
     AppLogging logging = new AppLogging();
     logging.configure(props);
@@ -47,6 +47,6 @@ public class App2 {
       new ClusterSchedulerImpl(props, new Cluster(clusterProperties)) :
       new NoClusterSchedulerImpl(props);
 
-    scheduler.start();
+    scheduler.startProcesses();
   }
 }

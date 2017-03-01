@@ -34,9 +34,10 @@ public class NoClusterSchedulerImpl extends BaseScheduler {
   }
 
   @Override
-  public void start() {
-    // Ordering javaCommands by ipcIndex org.sonar.process.ProcessId
+  public void startProcesses() {
     List<JavaCommand> javaCommands = javaCommandSupplier.get();
+    // Ordering javaCommands by ipcIndex org.sonar.process.ProcessId
+    // in order to start them in the right order
     Collections.sort(javaCommands);
 
   }

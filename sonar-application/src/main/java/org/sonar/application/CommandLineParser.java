@@ -31,7 +31,7 @@ class CommandLineParser {
   Properties parseArguments(String[] args) {
     Properties props = argumentsToProperties(args);
 
-    // complete with only the system properties that start with "sonar."
+    // complete with only the system properties that startProcesses with "sonar."
     for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
       String key = entry.getKey().toString();
       if (key.startsWith("sonar.")) {
@@ -49,7 +49,7 @@ class CommandLineParser {
     for (String arg : args) {
       if (!arg.startsWith("-D") || !arg.contains("=")) {
         throw new IllegalArgumentException(String.format(
-          "Command-line argument must start with -D, for example -Dsonar.jdbc.username=sonar. Got: %s", arg));
+          "Command-line argument must startProcesses with -D, for example -Dsonar.jdbc.username=sonar. Got: %s", arg));
       }
       String key = StringUtils.substringBefore(arg, "=").substring(2);
       String value = StringUtils.substringAfter(arg, "=");
