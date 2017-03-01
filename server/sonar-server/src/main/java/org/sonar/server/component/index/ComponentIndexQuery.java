@@ -22,20 +22,22 @@ package org.sonar.server.component.index;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import javax.annotation.CheckForNull;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 public class ComponentIndexQuery {
 
-  private final String query;
+  private String query;
   private Collection<String> qualifiers = Collections.emptyList();
   private Optional<Integer> limit = Optional.empty();
 
-  public ComponentIndexQuery(String query) {
+  public ComponentIndexQuery setQuery(String query) {
     requireNonNull(query);
     checkArgument(query.length() >= 2, "Query must be at least two characters long: %s", query);
     this.query = query;
+    return this;
   }
 
   public ComponentIndexQuery setQualifiers(Collection<String> qualifiers) {
@@ -47,6 +49,7 @@ public class ComponentIndexQuery {
     return qualifiers;
   }
 
+  @CheckForNull
   public String getQuery() {
     return query;
   }
