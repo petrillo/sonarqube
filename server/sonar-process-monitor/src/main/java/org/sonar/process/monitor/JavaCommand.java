@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang.StringUtils;
 import org.sonar.process.ProcessId;
 
-public class JavaCommand {
+public class JavaCommand implements Comparable<JavaCommand> {
 
   // unique key among the group of commands to launch
   private final ProcessId id;
@@ -148,5 +148,10 @@ public class JavaCommand {
     sb.append(", envVariables=").append(envVariables);
     sb.append('}');
     return sb.toString();
+  }
+
+  @Override
+  public int compareTo(JavaCommand o) {
+    return Integer.compare(o.getProcessId().getIpcIndex(), getProcessId().getIpcIndex());
   }
 }
