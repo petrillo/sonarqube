@@ -23,38 +23,30 @@
 package org.sonar.application;
 
 import java.util.Properties;
-import java.util.function.Function;
 import org.sonar.process.Props;
 
 /**
  * Entry-point of process that starts and monitors ElasticSearch, the Web Server and the Compute Engine.
  */
 public class App2 {
-  private final Function<Properties, Props> propsSupplier;
-  private final Cluster cluster;
-
-  App2(Properties commandLineArguments) {
-    this.propsSupplier = properties -> new PropsBuilder(properties, new JdbcSettings()).build();
-    Props props = propsSupplier.apply(commandLineArguments);
-
-    ClusterProperties clusterProperties = new ClusterProperties(props);
-    clusterProperties.populateProps(props);
-    AppLogging logging = new AppLogging();
-    logging.configure(props);
-    clusterProperties.validate();
-    this.cluster = new Cluster(clusterProperties);
-
-    Scheduler scheduler = clusterProperties.isEnabled() ?
-      new ClusterSchedulerImpl(props, cluster) :
-      new NoClusterSchedulerImpl(props);
-
-    scheduler.start();
-  }
 
   public void main(String... args) {
     CommandLineParser cli = new CommandLineParser();
     Properties commandLineArguments = cli.parseArguments(args);
 
-    new App2(commandLineArguments);
+    Props props = new PropsBuilder(commandLineArguments, new JdbcSettings()).build() ;
+
+    AppLogging logging = new AppLogging();
+    logging.configure(props);
+
+    ClusterProperties clusterProperties = new ClusterProperties(props);
+    clusterProperties.populateProps(props);
+    clusterProperties.validate();
+
+    Scheduler scheduler = clusterProperties.isEnabled() ?
+      new ClusterSchedulerImpl(props, new Cluster(clusterProperties)) :
+      new NoClusterSchedulerImpl(props);
+
+    scheduler.start();
   }
 }
