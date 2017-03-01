@@ -28,6 +28,11 @@ public class DbVersion64 implements DbVersion {
   public void addSteps(MigrationStepRegistry registry) {
     registry
       .add(1600, "Add Projects.TAGS", AddTagsToProjects.class)
-      .add(1601, "Set PROJECTS.COPY_COMPONENT_UUID on local views", SetCopyComponentUuidOnLocalViews.class);
+      .add(1601, "Set PROJECTS.COPY_COMPONENT_UUID on local views", SetCopyComponentUuidOnLocalViews.class)
+      .add(1602, "Add RULES_PROFILES.ORGANIZATION_UUID", AddQualityProfileOrganizationUuid.class)
+      .add(1603, "Set RULES_PROFILES.ORGANIZATION_UUID to default", SetQualityProfileOrganizationUuidToDefault.class)
+      .add(1604, "Set RULES_PROFILES.ORGANIZATION_UUID to not nullable", SetQualityProfileOrganizationUuidToNotNullable.class)
+      .add(1605, "Let RULES_PROFILES.KEE not be unique anymore", LetQualityProfileKeyNotBeUniqueAnymore.class)
+      .add(1606, "Let RULES_PROFILES.ORGANIZATION_UUID and KEE be unique", LetQualityProfileOrganizationUuidAndKeyBeUnique.class);
   }
 }

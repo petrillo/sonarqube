@@ -17,25 +17,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 package org.sonar.server.platform.db.migration.version.v64;
 
-import org.junit.Test;
+import java.sql.SQLException;
+import org.sonar.db.Database;
+import org.sonar.server.platform.db.migration.sql.DropIndexBuilder;
+import org.sonar.server.platform.db.migration.step.DdlChange;
 
-import static org.sonar.server.platform.db.migration.version.DbVersionTestUtils.verifyMigrationCount;
-import static org.sonar.server.platform.db.migration.version.DbVersionTestUtils.verifyMinimumMigrationNumber;
+public class LetQualityProfileKeyNotBeUniqueAnymore extends DdlChange {
 
-public class DbVersion64Test {
-  private DbVersion64 underTest = new DbVersion64();
-
-  @Test
-  public void migrationNumber_starts_at_1600() {
-    verifyMinimumMigrationNumber(underTest, 1600);
+  public LetQualityProfileKeyNotBeUniqueAnymore(Database db) {
+    super(db);
   }
 
-  @Test
-  public void verify_migration_count() {
-    verifyMigrationCount(underTest, 7);
+  @Override
+  public void execute(DdlChange.Context context) throws SQLException {
+    context.execute(
+      new DropIndexBuilder(getDialect())
+        .setTable("rules_profiles")
+        .setName("uniq_qprof_key")
+        .build());
   }
-
 }

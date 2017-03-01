@@ -17,25 +17,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 package org.sonar.server.platform.db.migration.version.v64;
 
+import java.sql.SQLException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.sonar.db.CoreDbTester;
 
-import static org.sonar.server.platform.db.migration.version.DbVersionTestUtils.verifyMigrationCount;
-import static org.sonar.server.platform.db.migration.version.DbVersionTestUtils.verifyMinimumMigrationNumber;
+public class SetQualityProfileOrganizationUuidToNotNullableTest {
 
-public class DbVersion64Test {
-  private DbVersion64 underTest = new DbVersion64();
+  /** @see org.sonar.db.AbstractDbTester#assertColumnDefinition(String, String, int, Integer, Boolean) */
+  private static final boolean NOT_NULLABLE = false;
+
+  @Rule
+  public CoreDbTester db = CoreDbTester.createForSchema(SetQualityProfileOrganizationUuidToNotNullableTest.class, "initial.sql");
+
+  public SetQualityProfileOrganizationUuidToNotNullable underTest = new SetQualityProfileOrganizationUuidToNotNullable(db.database());
 
   @Test
-  public void migrationNumber_starts_at_1600() {
-    verifyMinimumMigrationNumber(underTest, 1600);
+  public void test() throws SQLException {
+    underTest.execute();
+    db.assertColumnDefinition("rules_profiles", "organization_uuid", java.sql.Types.VARCHAR, 40, NOT_NULLABLE);
   }
-
-  @Test
-  public void verify_migration_count() {
-    verifyMigrationCount(underTest, 7);
-  }
-
 }
