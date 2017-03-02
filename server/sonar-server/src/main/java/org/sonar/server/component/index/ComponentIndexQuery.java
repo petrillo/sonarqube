@@ -19,9 +19,11 @@
  */
 package org.sonar.server.component.index;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.CheckForNull;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -35,6 +37,7 @@ public class ComponentIndexQuery {
 
   private String query;
   private Collection<String> qualifiers = Collections.emptyList();
+  private Set<String> componentUuids = Collections.emptySet();
   private Optional<Integer> limit = Optional.empty();
   private Sort sort = Sort.SCORE;
   private boolean asc = true;
@@ -53,6 +56,15 @@ public class ComponentIndexQuery {
 
   public Collection<String> getQualifiers() {
     return qualifiers;
+  }
+
+  public Set<String> getComponentUuids() {
+    return componentUuids;
+  }
+
+  public ComponentIndexQuery setComponentUuids(Set<String> componentUuids) {
+    this.componentUuids = ImmutableSet.copyOf(requireNonNull(componentUuids, "Component uuids cannot be null"));
+    return this;
   }
 
   @CheckForNull

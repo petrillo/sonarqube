@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -47,6 +48,7 @@ import org.sonar.server.permission.index.AuthorizationTypeSupport;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.elasticsearch.search.sort.SortOrder.ASC;
 import static org.elasticsearch.search.sort.SortOrder.DESC;
 import static org.sonar.server.component.index.ComponentIndexDefinition.FIELD_KEY;
@@ -107,6 +109,10 @@ public class ComponentIndex {
   private QueryBuilder createQuery(ComponentIndexQuery query, ComponentTextSearchFeature... features) {
     BoolQueryBuilder esQuery = boolQuery();
     esQuery.filter(authorizationTypeSupport.createQueryFilter());
+    Set<String> componentUuids = query.getComponentUuids();
+    if (!componentUuids.isEmpty()) {
+      esQuery.must(termsQuery("_id", componentUuids));
+    }
     String textQuery = query.getQuery();
     if (textQuery == null) {
       return esQuery.must(QueryBuilders.matchAllQuery());
