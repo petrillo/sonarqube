@@ -29,12 +29,18 @@ import static java.util.Objects.requireNonNull;
 
 public class ComponentIndexQuery {
 
+  public enum Sort {
+    NAME, SCORE
+  }
+
   private String query;
   private Collection<String> qualifiers = Collections.emptyList();
   private Optional<Integer> limit = Optional.empty();
+  private Sort sort = Sort.SCORE;
+  private boolean asc = true;
 
   public ComponentIndexQuery setQuery(String query) {
-    requireNonNull(query);
+    requireNonNull(query, "Query cannot be null");
     checkArgument(query.length() >= 2, "Query must be at least two characters long: %s", query);
     this.query = query;
     return this;
@@ -52,6 +58,24 @@ public class ComponentIndexQuery {
   @CheckForNull
   public String getQuery() {
     return query;
+  }
+
+  public Sort getSort() {
+    return sort;
+  }
+
+  public ComponentIndexQuery setSort(Sort sort) {
+    this.sort = requireNonNull(sort, "Sort cannot be null");
+    return this;
+  }
+
+  public boolean isAsc() {
+    return asc;
+  }
+
+  public ComponentIndexQuery setAsc(boolean asc) {
+    this.asc = asc;
+    return this;
   }
 
   /**

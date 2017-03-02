@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.sonar.server.component.index.ComponentIndexQuery.Sort;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,10 +38,14 @@ public class ComponentIndexQueryTest {
     ComponentIndexQuery query = new ComponentIndexQuery()
       .setQuery("SonarQube")
       .setQualifiers(asList("TRK", "FIL"))
+      .setSort(Sort.NAME)
+      .setAsc(false)
       .setLimit(5);
 
     assertThat(query.getQuery()).isEqualTo("SonarQube");
     assertThat(query.getQualifiers()).containsOnly("TRK", "FIL");
+    assertThat(query.getSort()).isEqualTo(Sort.NAME);
+    assertThat(query.isAsc()).isFalse();
     assertThat(query.getLimit().get()).isEqualTo(5);
   }
 
@@ -50,6 +55,8 @@ public class ComponentIndexQueryTest {
 
     assertThat(query.getQuery()).isNull();
     assertThat(query.getQualifiers()).isEmpty();
+    assertThat(query.getSort()).isEqualTo(Sort.SCORE);
+    assertThat(query.isAsc()).isTrue();
     assertThat(query.getLimit()).isNotPresent();
   }
 
@@ -102,5 +109,13 @@ public class ComponentIndexQueryTest {
       .setLimit(1);
 
     assertThat(query.getLimit()).isEqualTo(Optional.of(1));
+  }
+
+  @Test
+  public void should_fail_with_NPE_if_sort_is_null() {
+    expectedException.expect(NullPointerException.class);
+    expectedException.expectMessage("Sort cannot be null");
+
+    new ComponentIndexQuery().setSort(null);
   }
 }
